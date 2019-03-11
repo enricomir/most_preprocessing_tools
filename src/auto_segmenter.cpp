@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
                   vid.get(CAP_PROP_FPS), cur_frame.size());
     vid.set(CAP_PROP_POS_FRAMES, 0);
 
-    /*// Serial video
+    // Serial video
     auto start = std::chrono::system_clock::now();
     while (vid.get(CAP_PROP_POS_FRAMES) < max_frames) {
       // TODO: remove hardcap on 1000 frames
@@ -181,10 +181,10 @@ int main(int argc, char **argv) {
     }
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end - start;
-    std::cout << "Serial finished with: " << diff.count() << " seconds." << std::endl;*/
+    std::cout << "Serial finished with: " << diff.count() << " seconds." << std::endl;
 
     // Thread
-    std::vector<Mat> frames;
+    /*std::vector<Mat> frames;
     std::vector<std::future<Mat>> proc_frames;
     vid.set(CAP_PROP_POS_FRAMES, 0);
     auto start = std::chrono::system_clock::now();
@@ -207,6 +207,7 @@ int main(int argc, char **argv) {
     auto end = std::chrono::system_clock::now();
     auto diff = end - start;
     std::cout << "Finished with: " << diff.count() << " seconds." << std::endl;
+    */
   }
   return 0;
 }
