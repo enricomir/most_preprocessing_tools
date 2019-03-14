@@ -17,7 +17,7 @@ vector<Point> background;
 int cur_obj = 0;
 const char *WHNDL = "Segmenter (press q to quit)";
 string filename;
-const int blur_sz = 25;
+const int blur_sz = 45;
 
 void drawMask() {
   mask = Mat::zeros(image.size(), CV_32SC1);
