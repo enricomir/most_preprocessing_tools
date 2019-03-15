@@ -87,7 +87,8 @@ void align_functions(const turning_function &src, turning_function &dst,
 /** Returns the indexes of the best matching points (lowest area)
  * */
 std::pair<size_t, size_t> best_fit(const std::vector<Point> &f1,
-                                   const std::vector<Point> &f2) {
+                                   const std::vector<Point> &f2,
+                                   double *out_area = nullptr) {
 
   std::pair<size_t, size_t> ret;
   double min_area = 50000;
@@ -142,7 +143,7 @@ std::pair<size_t, size_t> best_fit(const std::vector<Point> &f1,
           //          << ", " << dst_f[dst_i].first << ")\n";
           if (src_f[src_i].first <
               dst_f[dst_i].first) { // Add a area do ultimo até aqui, e avança
-                                    // src polygon
+            // src polygon
             double dx =
                 src_f[src_i].first - std::max(last_src_step, last_dst_step);
             double dy = std::abs(src_f[src_i].second - dst_f[dst_i].second);
@@ -175,8 +176,39 @@ std::pair<size_t, size_t> best_fit(const std::vector<Point> &f1,
       // std::cout << "Final area: " << area << "\n";
     }
   }
-  std::cout << "Returning " << ret.first << "," << ret.second << " for area " << min_area << std::endl;
+  std::cout << "Returning " << ret.first << "," << ret.second << " for area "
+            << min_area << std::endl;
+
+  if (out_area != nullptr)
+    *out_area = min_area;
   return ret;
+}
+
+/** Reduces the red_poly by 1 vertex by minimizing the Arkin Area difference to
+ * ref_poly.
+ * Attention: this might induce reduction of significant points in the
+ * red_poly
+ */
+std::vector<Point> reduce_best_fit(const std::vector<Point> &ref_poly,
+                                   const std::vector<Point> &red_poly) {
+  std::vector<Point> result;
+  double min_area = 100000; //"Infinite" constant TODO
+
+  for (size_t i = 0; i < red_poly.size(); ++i) {
+    double area;
+    std::vector<Point> current_iteration = red_poly;
+
+    current_iteration.erase(current_iteration.begin() + i);
+
+    best_fit(ref_poly, current_iteration, &area);
+
+    if (area < min_area) {
+      area = min_area;
+      result = current_iteration;
+    }
+  }
+
+  return result;
 }
 
 int main(int argc, char *argv[]) {
@@ -218,5 +250,27 @@ int main(int argc, char *argv[]) {
       }
     }
     best_fit(polys[0], polys[1]);
+
+    while (polys[0].size() < polys[1].size()) {
+      polys[1] = reduce_best_fit(polys[0], polys[1]);
+    }
+
+    while (polys[1].size() < polys[0].size()) {
+      polys[0] = reduce_best_fit(polys[1], polys[0]);
+    }
+
+    {
+      std::ofstream fs("corr_1.pof");
+      for (auto p : polys[0]) {
+        fs << p.x << " " << p.y << "\n";
+      }
+
+      {
+        std::ofstream fs("corr_2.pof");
+        for (auto p : polys[1]) {
+          fs << p.x << " " << p.y << "\n";
+        }
+      }
+    }
   }
 }
