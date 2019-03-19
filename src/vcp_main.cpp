@@ -208,6 +208,8 @@ std::vector<Point> reduce_best_fit(const std::vector<Point> &ref_poly,
     }
   }
 
+  // TODO: Rotation
+
   return result;
 }
 
@@ -259,17 +261,25 @@ int main(int argc, char *argv[]) {
       polys[0] = reduce_best_fit(polys[1], polys[0]);
     }
 
+    std::pair<size_t, size_t> bests = best_fit(polys[0], polys[1]);
+    std::rotate(polys[0].begin(), polys[0].begin() + bests.first,
+                polys[0].end());
+    std::rotate(polys[1].begin(), polys[1].begin() + bests.second,
+                polys[1].end());
+
     {
+      int i = 0;
       std::ofstream fs("corr_1.pof");
       for (auto p : polys[0]) {
-        fs << p.x << " " << p.y << "\n";
+        fs << ++i << " " << p.x << " " << p.y << "\n";
       }
+    }
 
-      {
-        std::ofstream fs("corr_2.pof");
-        for (auto p : polys[1]) {
-          fs << p.x << " " << p.y << "\n";
-        }
+    {
+      int i = 0;
+      std::ofstream fs("corr_2.pof");
+      for (auto p : polys[1]) {
+        fs << ++i << " " << p.x << " " << p.y << "\n";
       }
     }
   }
