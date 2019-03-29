@@ -9,7 +9,8 @@ include_directories("./inc")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Werror -g -pthread")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Werror -g -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Werror -g -fopenmp")
 
 add_executable(segmenter src/segmenter_main.cpp)
 target_link_libraries(segmenter ${OpenCV_LIBS})
@@ -31,3 +32,6 @@ target_link_libraries(auto_segmenter ${OpenCV_LIBS})
 
 add_executable(vcp src/vcp_main.cpp)
 target_link_libraries(vcp ${OpenCV_LIBS})	
+
+add_executable(smoke_remover src/smoke_remover.cpp)
+target_link_libraries(smoke_remover ${OpenCV_LIBS})	
