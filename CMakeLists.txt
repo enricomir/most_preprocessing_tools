@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
-project( DisplayImage )
+project( MOST )
 find_package( OpenCV REQUIRED )
 
 message(${OpenCV_LIBS})
 
-include_directories( ${OpenCV_INCLUDE_DIRS} )
-include_directories("./inc")
+include_directories( ${OpenCV_INCLUDE_DIRS} "./inc")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_BUILD_TYPE Release)
@@ -35,3 +34,15 @@ target_link_libraries(vcp ${OpenCV_LIBS})
 
 add_executable(smoke_remover src/smoke_remover.cpp)
 target_link_libraries(smoke_remover ${OpenCV_LIBS})	
+
+#add_executable(terminal src/terminal.cpp src/polygon.cpp)
+#target_link_libraries(terminal ${OpenCV_LIBS})	
+
+##############GEOS########################
+find_library(GEOS_C geos_c)
+find_path(GEOS_INC geos_c.h)
+
+message(${GEOS})
+message(${GEOS_INC})
+add_executable(geom src/geos_main.cpp)
+target_link_libraries(geom ${GEOS})
