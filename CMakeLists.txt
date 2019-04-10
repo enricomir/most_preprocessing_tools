@@ -35,8 +35,8 @@ target_link_libraries(vcp ${OpenCV_LIBS})
 add_executable(smoke_remover src/smoke_remover.cpp)
 target_link_libraries(smoke_remover ${OpenCV_LIBS})	
 
-#add_executable(terminal src/terminal.cpp src/polygon.cpp)
-#target_link_libraries(terminal ${OpenCV_LIBS})	
+add_executable(terminal src/terminal.cpp src/polygon.cpp)
+target_link_libraries(terminal ${OpenCV_LIBS} ${GEOS})	
 
 ##############GEOS########################
 find_library(GEOS_C geos_c)

@@ -49,7 +49,7 @@ int main(int, char **) {
         dist = Polygon::polis(p1, p2);
       }
 
-      std::cout << "Distance: " << dist << std::endl;
+      std::cout << dist << std::endl;
 
       words.clear();
     } else {
