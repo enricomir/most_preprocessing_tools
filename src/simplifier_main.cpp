@@ -123,11 +123,13 @@ void recalcTolerance(int, void *) {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 3 && argc != 4) {
+  if (argc != 3 && argc != 4 && argc != 5) {
     std::cout << "Wrong usage! Correct usages:\n"
                  "  ./simplifier <source points file (.pof)> <source image>\n"
                  "  ./simplifier <source points file (.pof)> <step> "
-                 "<iterations> for chart generation\n";
+                 "<iterations> for chart generation\n"
+                 "  ./simplifier <source points file (.pof)> <output file "
+                 "(.pof)> t <tolerance> for auto simplification\n";
     exit(1);
   }
 
@@ -183,11 +185,11 @@ int main(int argc, char *argv[]) {
       simp = simplify(points, f);
       fs2 << f << " " << simp.size() << "\n";
     }
-  } else if (argc == 3) { //NUnca entra aqui lol TODO
-    float f = std::stof(argv[2]);
+  } else if (argc == 5) {
+    double d = std::stod(argv[4]);
     std::vector<Point> simp;
-    simp = simplify(points, f);
-    std::fstream fs2(fname + "_simplified.pof",
+    simp = simplify(points, d);
+    std::fstream fs2(argv[2],
                      std::fstream::out | std::fstream::trunc);
 
     for (Point p : simp) {

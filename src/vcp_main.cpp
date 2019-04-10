@@ -268,18 +268,18 @@ int main(int argc, char *argv[]) {
                 polys[1].end());
 
     {
-      int i = 0;
+      //int i = 0;
       std::ofstream fs("corr_1.pof");
       for (auto p : polys[0]) {
-        fs << ++i << " " << p.x << " " << p.y << "\n";
+        fs << /*++i << " " <<*/ p.x << " " << p.y << "\n";
       }
     }
 
     {
-      int i = 0;
+      //int i = 0;
       std::ofstream fs("corr_2.pof");
       for (auto p : polys[1]) {
-        fs << ++i << " " << p.x << " " << p.y << "\n";
+        fs << /*++i << " " <<*/ p.x << " " << p.y << "\n";
       }
     }
   }
