@@ -18,11 +18,11 @@ class Polygon {
         Polygon() {};
         
 
-        void save(std::ostream& output_file, FileType ftype = FileType::FILE_POF);
+        void save(std::ostream& output_file, FileType ftype = FileType::FILE_POF) const;
 
-        void get_feature_points(); //TODO: return vector of size_t
+        void get_feature_points() const; //TODO: return vector of size_t
 
-        Polygon get_slice(size_t begin, size_t end);
+        Polygon get_slice(size_t begin, size_t end) const;
 
         //Static methods
         static double hausdorff(const Polygon& pol1, const Polygon& pol2);

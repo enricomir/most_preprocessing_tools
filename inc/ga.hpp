@@ -13,10 +13,8 @@ class GA {
 public:
 
 
-  GA(const uint pop, const double mut_chance, const double cross_rate,
-     const Polygon &p1, const Polygon &p2)
-      : pop(pop), mut_chance(mut_chance), cross_rate(cross_rate), p1(p1),
-        p2(p2) {}
+  GA(const uint pop_size, const double mut_chance, const double cross_rate,
+     const Polygon &p1, const Polygon &p2);
 
   std::vector<correspondence> run();
 
@@ -26,18 +24,20 @@ public:
     double performance;
   };
 
-  const uint pop;
+  const uint pop_size;
   const double mut_chance, cross_rate;
   const Polygon &p1;
   const Polygon &p2;
 
+  std::vector<individual> pop;
+
   correspondence get_random_correspondence(const individual &ind);
 
-  void mutate(individual &ind);
+  void mutate(individual &ind, bool force_grow=false);
 
   void cross(individual &ind1, individual &ind2);
 
-  double eval(const individual &) { return 0; }
+  double eval(const individual &ind);
 };
 
 #endif // GA_HPP_

@@ -59,7 +59,7 @@ Polygon::Polygon(std::istream &input_file, FileType ftype) {
 
 /** Saves to specific stream with format specified by FileType
  * */
-void Polygon::save(std::ostream &output_file, FileType ftype) {
+void Polygon::save(std::ostream &output_file, FileType ftype) const {
   if (ftype == FileType::FILE_POF) {
     for (auto p : points) {
       output_file << p.x << " " << p.y << "\n";
@@ -264,7 +264,7 @@ double Polygon::polis(const Polygon &pol1, const Polygon &pol2) {
   return (d_12 + d_21) / 2;
 }
 
-void Polygon::get_feature_points() {
+void Polygon::get_feature_points() const {
   std::vector<double> avg, min, max;
   for (size_t i = 0; i < points.size(); ++i) { // Points to generate curvature
     std::vector<double> angles;
@@ -321,11 +321,19 @@ void Polygon::get_feature_points() {
 
 /** Returns a linear segment of a slice.
  * */
-Polygon Polygon::get_slice(size_t begin, size_t end) {
+Polygon Polygon::get_slice(size_t begin, size_t end) const {
   Polygon ret;
 
-  for (size_t i = begin; i < end; ++i)
-    ret.points.push_back(SimplePoint(points[i].x, points[i].y));
+  if (begin < end) {
+    for (size_t i = begin; i < end; ++i)
+      ret.points.push_back(points[i]);
+  } else {
+    for (size_t i = begin; i < points.size(); ++i)
+      ret.points.push_back(points[i]);
+
+    for (size_t i = 0; i < end; ++i)
+      ret.points.push_back(points[i]);
+  }
 
   return ret;
 }

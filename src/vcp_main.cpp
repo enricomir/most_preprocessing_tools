@@ -176,8 +176,8 @@ std::pair<size_t, size_t> best_fit(const std::vector<Point> &f1,
       // std::cout << "Final area: " << area << "\n";
     }
   }
-  std::cout << "Returning " << ret.first << "," << ret.second << " for area "
-            << min_area << std::endl;
+  //std::cout << "Returning " << ret.first << "," << ret.second << " for area "
+  //          << min_area << std::endl;
 
   if (out_area != nullptr)
     *out_area = min_area;

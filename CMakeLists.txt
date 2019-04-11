@@ -3,13 +3,20 @@ project( MOST )
 find_package( OpenCV REQUIRED )
 
 message(${OpenCV_LIBS})
+message(${OpenCV_INCLUDE_DIRS})
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
 
 include_directories( ${OpenCV_INCLUDE_DIRS} "./inc")
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Werror -g -pthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -Wall -Wextra -Werror -g -fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 add_executable(segmenter src/segmenter_main.cpp)
 target_link_libraries(segmenter ${OpenCV_LIBS})
@@ -46,6 +53,9 @@ message(${GEOS})
 message(${GEOS_INC})
 add_executable(geom src/geos_main.cpp src/polygon.cpp)
 target_link_libraries(geom ${GEOS})
+
+add_executable(msimp src/multi_simplifier.cpp src/polygon.cpp)
+target_link_libraries(msimp ${GEOS})
 
 add_executable(ga src/ga_main.cpp src/polygon.cpp src/ga.cpp)
 target_link_libraries(ga ${GEOS})
