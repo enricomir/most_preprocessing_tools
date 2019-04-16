@@ -47,7 +47,7 @@ void genOverlay() {
   addWeighted(image, 0.5, m, 0.5, 0, segmented);
 
   imshow(WHNDL, segmented);
-  // imshow("mask", m);
+   imshow("mask", m);
   // imshow("blurred", blurred);
 }
 
@@ -56,7 +56,7 @@ void generateContour() {
   mask.convertTo(binary, CV_32FC1);
   threshold(binary, binary, 200, 255, THRESH_BINARY);
   binary.convertTo(binary, CV_8UC1);
-  // imshow("Binary", binary);
+   imshow("Binary", binary);
   std::vector<std::vector<Point>> vertexes;
   // CHAIN_APPROX_NONE, CHAIN_APPROX_SIMPLE, CHAIN_APPROX_TC89_L1,
   // CHAIN_APPROX_TC89_KCOS

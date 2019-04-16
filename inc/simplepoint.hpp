@@ -5,10 +5,10 @@ struct SimplePoint {
   double x, y;
   SimplePoint(double x, double y) : x(x), y(y){};
 
-  static double norm(const SimplePoint &p1, const SimplePoint &p2) {
+  static double norm(const SimplePoint &p1, const SimplePoint &p2, double dz = 0.0) {
     double dx = p1.x - p2.x;
     double dy = p1.y - p2.y;
-    return std::sqrt(dx * dx + dy * dy);
+    return std::sqrt(dx * dx + dy * dy + dz*dz);
   }
 };
 

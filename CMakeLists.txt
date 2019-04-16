@@ -54,7 +54,7 @@ message(${GEOS_INC})
 add_executable(geom src/geos_main.cpp src/polygon.cpp)
 target_link_libraries(geom ${GEOS})
 
-add_executable(msimp src/multi_simplifier.cpp src/polygon.cpp)
+add_executable(msimp src/multi_simplifier.cpp src/polygon.cpp src/simplifier.cpp)
 target_link_libraries(msimp ${GEOS})
 
 add_executable(ga src/ga_main.cpp src/polygon.cpp src/ga.cpp)
