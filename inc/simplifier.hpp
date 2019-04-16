@@ -61,6 +61,7 @@ namespace Simplifier {
 	}*/
 
 	void tetrahedral_until_n_points(std::vector<Polygon> polys, float red_percentage); 
+	void visvalingam_with_time(std::vector<Polygon> polys, float red_percentage, float time_value);
 }; // namespace Simplifier
 
 #endif //SIMPLIFIER_HPP_

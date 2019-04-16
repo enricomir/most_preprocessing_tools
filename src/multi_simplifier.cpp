@@ -208,7 +208,8 @@ int main(int argc, char* argv[]) {
 		polis.push_back(p1);
 		polis.push_back(p2);
 
-		Simplifier::tetrahedral_until_n_points(polis, 0.875);
+		//Simplifier::tetrahedral_until_n_points(polis, 0.125);
+		Simplifier::visvalingam_with_time(polis, 0.125, 1);
 
 		std::cout << "Error - too few arguments. Usage:\n"
 			<< "  ./msimp <t/n/p> <value> <file1> <file2> ...\n";

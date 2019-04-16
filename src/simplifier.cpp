@@ -131,3 +131,117 @@ void Simplifier::tetrahedral_until_n_points (std::vector<Polygon> polys, float r
 		}
 	}
 }
+
+//Haussforf-like metric
+double get_cost(size_t i, Polygon pol, Polygon next_pol) {
+	double max_cost = 0.0;
+	for (SimplePoint p: next_pol.points) {
+		double cost = SimplePoint::norm(pol.points[i], p);
+		double found_closer = false; //Checks if i is closest point
+		for (SimplePoint p1: pol.points) {
+			if (cost > SimplePoint::norm(p, p1)) {
+				found_closer = true; 
+				break;
+			}
+		}
+		if (!found_closer) { //If i is the closest point, we check max_cost
+			if (cost > max_cost) {
+				max_cost = cost;
+			}
+		}
+	}
+
+	return max_cost;
+}
+
+//Get area of triangle centered on i
+double get_triangle(size_t i, Polygon pol) {
+	SimplePoint pt(0, 0);  //Current point
+	SimplePoint ptp(0, 0); //Previous point
+	SimplePoint ptn(0, 0); //Next point
+
+	pt = pol.points[i];
+
+	if (i == 0) {
+		ptp = pol.points[pol.points.size() - 1];
+	} else {
+		ptp = pol.points[i-1];
+	}
+
+	if (i == (pol.points.size()-1)) {
+		ptn = pol.points[0];
+	} else {
+		ptn = pol.points[i+1];
+	}
+
+	double a = SimplePoint::norm(pt, ptp);
+	double b = SimplePoint::norm(pt, ptn);
+	double c = SimplePoint::norm(ptp, ptn);
+
+	double p = (a+b+c)/2;
+
+	return std::sqrt(p*(p-a)*(p-b)*(p-c));
+}
+
+void Simplifier::visvalingam_with_time(std::vector<Polygon> polys, float red_percentage, float time_value) {
+	//Not enough polygons
+	if (polys.size() < 2) return;
+	std::vector<size_t> red_number;
+
+	//Decides how many points to remove from each polygon
+	for (size_t i = 0; i < polys.size(); ++i) {
+		red_number.push_back(polys[i].points.size()*red_percentage);
+	}
+
+	bool cont=true;
+	while (cont) {
+		//Removes 1 point from any needed polygon
+		for (size_t i_pol = 0; i_pol < polys.size(); ++i_pol) {
+			if (red_number[i_pol] == 0) continue; //If removed all needed points, move on
+
+			//Minimum cost of points, and point associated with this cost
+			double min_cost=std::numeric_limits<double>::max();
+			size_t to_remove=0;
+
+			//Calculates the cost for all points
+			for (size_t i_pt = 0; i_pt < polys[i_pol].points.size(); ++i_pt) {
+				//Cost to remove from previous shape
+				double cost_previous = 0.0;
+				if (i_pol > 0) {
+					cost_previous = get_cost(i_pt, polys[i_pol], polys[i_pol-1]);
+				}
+
+				//Cost to remove from next shape
+				double cost_next = 0.0;
+				if (i_pol < (polys.size()-1)) {
+					cost_next = get_cost(i_pt, polys[i_pol], polys[i_pol+1]);
+				}
+
+				//Checks if current point is the cheapest to remove
+				double cost_time = (cost_previous > cost_next? cost_previous : cost_next);
+				double cost_triangle = get_triangle(i_pt, polys[i_pol]);
+
+				double cost = (cost_time*time_value > cost_triangle? cost_time*time_value : cost_triangle);
+
+				if (cost < min_cost) {
+					to_remove = i_pt;
+					min_cost = cost;
+				}
+			}
+			//Removes the cheapest point
+			polys[i_pol].points.erase(polys[i_pol].points.begin() + to_remove);
+			red_number[i_pol]--;
+		}
+
+		//Loop condition - if there is still any points to remove
+		cont = false;
+		for (size_t i = 0; i < polys.size(); ++i) {
+			if (red_number[i] != 0) {
+				cont = true;
+				break;
+			}
+		}
+	}
+}
+
+
