@@ -18,7 +18,7 @@ double norm(const SimplePoint &p1, const SimplePoint &p2) {
  * */
 Polygon::Polygon(std::istream &input_file, FileType ftype) {
   if (ftype == FileType::FILE_POF) {
-    int x, y;
+    double x, y;
     while (input_file >> x >> y) {
       points.emplace_back(x, y);
     }
@@ -111,6 +111,18 @@ double Polygon::hausdorff(const Polygon &pol1, const Polygon &pol2) {
     double min_dist = std::numeric_limits<double>::max();
 
     for (auto p2 : pol2.points) {
+      double dist = norm(p1, p2);
+      if (dist < min_dist)
+        min_dist = dist;
+    }
+    if (min_dist > max_dist)
+      max_dist = min_dist;
+  }
+
+  for (auto p1 : pol2.points) {
+    double min_dist = std::numeric_limits<double>::max();
+
+    for (auto p2 : pol1.points) {
       double dist = norm(p1, p2);
       if (dist < min_dist)
         min_dist = dist;

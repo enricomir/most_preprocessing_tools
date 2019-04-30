@@ -135,10 +135,14 @@ void Simplifier::tetrahedral_until_n_points (std::vector<Polygon> polys, float r
 //Haussforf-like metric
 double get_cost(size_t i, Polygon pol, Polygon next_pol) {
 	double max_cost = 0.0;
+	double min_from_i = std::numeric_limits<double>::max(); //Last change
 	for (SimplePoint p: next_pol.points) {
 		double cost = SimplePoint::norm(pol.points[i], p);
 		double found_closer = false; //Checks if i is closest point
 		for (SimplePoint p1: pol.points) {
+			if (min_from_i > SimplePoint::norm(p, p1)) { //Last change
+				min_from_i = SimplePoint::norm(p, p1);
+			}
 			if (cost > SimplePoint::norm(p, p1)) {
 				found_closer = true; 
 				break;
@@ -151,7 +155,7 @@ double get_cost(size_t i, Polygon pol, Polygon next_pol) {
 		}
 	}
 
-	return max_cost;
+	return (min_from_i > max_cost ? min_from_i : max_cost);
 }
 
 //Get area of triangle centered on i
@@ -183,7 +187,7 @@ double get_triangle(size_t i, Polygon pol) {
 	return std::sqrt(p*(p-a)*(p-b)*(p-c));
 }
 
-void Simplifier::visvalingam_with_time(std::vector<Polygon> polys, float red_percentage, float time_value) {
+void Simplifier::visvalingam_with_time(std::vector<Polygon>& polys, float red_percentage, float time_value) {
 	//Not enough polygons
 	if (polys.size() < 2) return;
 	std::vector<size_t> red_number;
@@ -196,6 +200,13 @@ void Simplifier::visvalingam_with_time(std::vector<Polygon> polys, float red_per
 	bool cont=true;
 	while (cont) {
 		//Removes 1 point from any needed polygon
+		size_t max = 0;
+		for (auto s: red_number)
+			if (s > max)
+				max = s;
+
+		std::cout << "Reduced another point. Current max points: " << max << std::endl;
+
 		for (size_t i_pol = 0; i_pol < polys.size(); ++i_pol) {
 			if (red_number[i_pol] == 0) continue; //If removed all needed points, move on
 
@@ -244,4 +255,24 @@ void Simplifier::visvalingam_with_time(std::vector<Polygon> polys, float red_per
 	}
 }
 
+void Simplifier::visvalingam_until_n(Polygon& poly, const float& red_percentage) {
+	size_t red_number = poly.points.size() * red_percentage;
+
+	while (red_number > 0) {
+		size_t to_remove = 0;
+		float min_area = get_triangle(0, poly);
+
+		for (size_t i = 1; i < poly.points.size(); ++i) {
+			float cur_area = get_triangle(i, poly);
+			if (cur_area < min_area) {
+				to_remove = i;
+				min_area = cur_area;
+			}
+		}
+
+		poly.points.erase(poly.points.begin() + to_remove);
+
+		red_number--;
+	}
+}
 

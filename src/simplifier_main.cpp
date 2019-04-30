@@ -103,97 +103,143 @@ std::vector<Point> simplify(const std::vector<Point> &origin, float min_area) {
   return reduced;
 }
 
+std::vector<Point> simplify_n(const std::vector<Point>& origin, size_t to_remove) {
+  std::vector<Point> reduced = origin;
+	for (size_t i = 0; i < to_remove; ++i) {
+		float min_area = std::numeric_limits<float>::max();
+		size_t to_remove = 0;
+
+		reduced.push_back(reduced[0]);
+		reduced.push_back(reduced[1]);
+
+		for (unsigned int i = 0;i < (reduced.size() -	2); ++i) {
+
+			float dx01, dx02, dx12, dy01, dy02,
+						dy12;               // DcAB = distance between A and B in coord c
+			float d01, d02, d12, p; // p = semiperimeter
+
+			dx01 = reduced[i + 0].x - reduced[i + 1].x;
+			dy01 = reduced[i + 0].y - reduced[i + 1].y;
+			d01 = std::sqrt(dx01 * dx01 + dy01 * dy01);
+
+			dx02 = reduced[i + 0].x - reduced[i + 2].x;
+			dy02 = reduced[i + 0].y - reduced[i + 2].y;
+			d02 = std::sqrt(dx02 * dx02 + dy02 * dy02);
+
+			dx12 = reduced[i + 1].x - reduced[i + 2].x;
+			dy12 = reduced[i + 1].y - reduced[i + 2].y;
+			d12 = std::sqrt(dx12 * dx12 + dy12 * dy12);
+
+			p = (d01 + d02 + d12) / 2;
+
+			float area_sq = p * (p - d01) * (p - d02) * (p - d12);
+
+			// if the area is smaller than the current min area acceptable, mark as to remove
+			if (area_sq < min_area) {
+				to_remove = i;
+				min_area = area_sq;
+			}
+
+      reduced.erase(reduced.begin() +
+                    (to_remove + 1) % (reduced.size() - 2)); // Erase the point
+			reduced.pop_back();
+			reduced.pop_back();
+		}
+	}
+	return reduced;
+}
+
 void recalcTolerance(int, void *) {
-  Mat poly;
-  src.copyTo(poly);
-  polys.clear();
-  polys.push_back(points);
-  drawContours(poly, polys, 0, Scalar(0, 255, 0));
+	Mat poly;
+	src.copyTo(poly);
+	polys.clear();
+	polys.push_back(points);
+	drawContours(poly, polys, 0, Scalar(0, 255, 0));
 
-  std::vector<Point> simplified;
-  simplified = simplify(points, gui_area / RATIO);
-  polys.push_back(simplified);
+	std::vector<Point> simplified;
+	simplified = simplify(points, gui_area / RATIO);
+	polys.push_back(simplified);
 
-  std::cout << "Simplified " << points.size() << " points with "
-            << gui_area / RATIO << " tolerance. Result: " << simplified.size()
-            << "points." << std::endl;
+	std::cout << "Simplified " << points.size() << " points with "
+		<< gui_area / RATIO << " tolerance. Result: " << simplified.size()
+		<< "points." << std::endl;
 
-  drawContours(poly, polys, 1, Scalar(0, 0, 255));
-  imshow(W_NAME, poly);
+	drawContours(poly, polys, 1, Scalar(0, 0, 255));
+	imshow(W_NAME, poly);
 }
 
 int main(int argc, char *argv[]) {
-  if (argc != 3 && argc != 4 && argc != 5) {
-    std::cout << "Wrong usage! Correct usages:\n"
-                 "  ./simplifier <source points file (.pof)> <source image>\n"
-                 "  ./simplifier <source points file (.pof)> <step> "
-                 "<iterations> for chart generation\n"
-                 "  ./simplifier <source points file (.pof)> <output file "
-                 "(.pof)> t <tolerance> for auto simplification\n";
-    exit(1);
-  }
+	if (argc != 3 && argc != 4 && argc != 5) {
+		std::cout << "Wrong usage! Correct usages:\n"
+			"  ./simplifier <source points file (.pof)> <source image>\n"
+			"  ./simplifier <source points file (.pof)> <step> "
+			"<iterations> for chart generation\n"
+			"  ./simplifier <source points file (.pof)> <output file "
+			"(.pof)> t <tolerance> for auto simplification\n";
+		exit(1);
+	}
 
-  std::fstream fs(argv[1], std::fstream::in);
+	std::fstream fs(argv[1], std::fstream::in);
 
-  if (!fs.is_open()) {
-    std::cout << "Error, could not load file " << argv[1] << std::endl;
-    exit(2);
-  }
+	if (!fs.is_open()) {
+		std::cout << "Error, could not load file " << argv[1] << std::endl;
+		exit(2);
+	}
 
-  int x, y;
-  while (fs >> x >> y) {
-    points.emplace_back(x, y);
-  }
+	int x, y;
+	while (fs >> x >> y) {
+		points.emplace_back(x, y);
+	}
 
-  std::string fname(argv[1]);
-  fname.pop_back();
-  fname.pop_back();
-  fname.pop_back();
-  fname.pop_back();
+	std::string fname(argv[1]);
+	fname.pop_back();
+	fname.pop_back();
+	fname.pop_back();
+	fname.pop_back();
 
-  if (argc == 3) {
-    src = imread(argv[2]);
+	if (argc == 3) {
+		src = imread(argv[2]);
 
-    namedWindow(W_NAME, WINDOW_NORMAL);
-    createTrackbar("Tolerance (px squared*10)", W_NAME, &gui_area, 2000,
-                   recalcTolerance);
-    recalcTolerance(0, nullptr);
+		namedWindow(W_NAME, WINDOW_NORMAL);
+		createTrackbar("Tolerance (px squared*10)", W_NAME, &gui_area, 2000,
+				recalcTolerance);
+		recalcTolerance(0, nullptr);
 
-    char c;
-    while ((c = waitKey()) != 'q') {
-      if (c == 's') {
-        std::vector<Point> simp;
-        simp = simplify(points, gui_area / RATIO);
-        std::fstream fs2(fname + "_simplified.pof",
-                         std::fstream::out | std::fstream::trunc);
+		char c;
+		while ((c = waitKey()) != 'q') {
+			if (c == 's') {
+				std::vector<Point> simp;
+				simp = simplify(points, gui_area / RATIO);
+				std::fstream fs2(fname + "_simplified.pof",
+						std::fstream::out | std::fstream::trunc);
 
-        for (Point p : simp) {
-          fs2 << p.x << " " << p.y << "\n";
-        }
-      }
-    }
-  } else if (argc == 4) {
-    std::fstream fs2(fname + "_simplification_chart.csv",
-                     std::fstream::out | std::fstream::trunc);
+				for (Point p : simp) {
+					fs2 << p.x << " " << p.y << "\n";
+				}
+			}
+		}
+	} else if (argc == 4) {
+		std::fstream fs2(fname + "_simplification_chart.csv",
+				std::fstream::out | std::fstream::trunc);
 
-    unsigned int step = std::stoi(argv[2]);
-    unsigned int iterations = std::stoi(argv[3]);
+		unsigned int step = std::stoi(argv[2]);
+		unsigned int iterations = std::stoi(argv[3]);
 
-    fs2 << "0 " << points.size() << "\n";
-    for (float f = step; f < (step * iterations); f += step) {
-      std::vector<Point> simp;
-      simp = simplify(points, f);
-      fs2 << f << " " << simp.size() << "\n";
-    }
-  } else if (argc == 5) {
-    double d = std::stod(argv[4]);
-    std::vector<Point> simp;
-    simp = simplify(points, d);
-    std::fstream fs2(argv[2],
-                     std::fstream::out | std::fstream::trunc);
+		fs2 << "0 " << points.size() << "\n";
+		for (float f = step; f < (step * iterations); f += step) {
+			std::vector<Point> simp;
+			simp = simplify(points, f);
+			fs2 << f << " " << simp.size() << "\n";
+		}
+	} else if (argc == 5) {
+		float n = std::stof(argv[4]);
+		std::vector<Point> simp;
+		simp = simplify_n(points, static_cast<int>(n*points.size()));
+		std::fstream fs2(argv[2],
+				std::fstream::out | std::fstream::trunc);
 
-    for (Point p : simp) {
-      fs2 << p.x << " " << p.y << "\n";
-    }
-  }
+		for (Point p : simp) {
+			fs2 << p.x << " " << p.y << "\n";
+		}
+	}
 }

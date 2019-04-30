@@ -198,23 +198,42 @@ int main(int argc, char* argv[]) {
 	p1.save(o1);
 	}*/
 
-	if (argc < 4) {
-		std::ifstream if1("msimp1.pof");
-		std::ifstream if2("msimp2.pof");
-
-		Polygon p1(if1), p2(if2);
-		
-		std::vector<Polygon> polis;
-		polis.push_back(p1);
-		polis.push_back(p2);
-
-		//Simplifier::tetrahedral_until_n_points(polis, 0.125);
-		Simplifier::visvalingam_with_time(polis, 0.125, 1);
-
+	if (argc < 4 && argc != 3) {
 		std::cout << "Error - too few arguments. Usage:\n"
-			<< "  ./msimp <t/n/p> <value> <file1> <file2> ...\n";
-			std::cout << argv[1];
-		return -1;
+			<< "  ./msimp p <value> <file1> <file2> ...\n"
+			<< "  ./msimp <value> <file>\n";
+		return 1;
+	} else if (argc == 3) {
+		double red = std::stod(argv[1]);
+		std::ifstream in(argv[2]);
+		Polygon p(in);
+
+		Simplifier::visvalingam_until_n(p, red);
+
+		std::ofstream out_file("simp_"+std::string(argv[2]));
+		p.save(out_file);
+	} else {
+		std::vector<Polygon> polis;
+
+		for (int i = 3; i < argc; ++i) {
+			std::cout << "Opening " << argv[i] << std::endl;
+			std::ifstream in(argv[i]);
+
+			Polygon p(in);
+			polis.push_back(p);
+		}
+		double red = std::stof(argv[2]);
+
+		std::cout << "Opened all. Red:" << red << "\n";
+
+		Simplifier::visvalingam_with_time(polis, red, 5);
+		std::cout << "Simplified all.\n";
+
+		for (size_t i = 0; i < polis.size(); ++i) {
+			std::cout << "Saving to " << ("msimp_"+std::string(argv[i+3])) << "\n";
+			std::ofstream out_file("msimp_"+std::string(argv[i+3]));
+			polis[i].save(out_file);
+		}
 	}
 
 	return 0;

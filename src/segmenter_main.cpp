@@ -17,7 +17,7 @@ vector<Point> background;
 int cur_obj = 0;
 const char *WHNDL = "Segmenter (press q to quit)";
 string filename;
-const int blur_sz = 45;
+const int blur_sz = 5;
 
 void drawMask() {
   mask = Mat::zeros(image.size(), CV_32SC1);
@@ -47,7 +47,7 @@ void genOverlay() {
   addWeighted(image, 0.5, m, 0.5, 0, segmented);
 
   imshow(WHNDL, segmented);
-   imshow("mask", m);
+  // imshow("mask", m);
   // imshow("blurred", blurred);
 }
 
@@ -113,9 +113,9 @@ static void onMouse(int event, int x, int y, int, void *) {
 
   drawMask();
 
-  // blur(image, blurred, {blur_sz, blur_sz});
+   blur(image, blurred, {blur_sz, blur_sz});
   // image.copyTo(blur);
-  blurred = image.clone();
+  //blurred = image.clone();
 
   watershed(blurred, mask);
   genOverlay();
