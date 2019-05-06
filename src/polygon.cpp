@@ -55,6 +55,20 @@ Polygon::Polygon(std::istream &input_file, FileType ftype) {
     GEOSWKTReader_destroy_r(geos, r); // Free the reader
     GEOS_finish_r(geos);              // Finish the context
   }
+
+	//Calculates linear coordinates
+	double accum = 0.0;
+	double perim = 0.0;
+	for (size_t i = 0; i < (points.size() - 1); ++i) {
+		perim += SimplePoint::norm(points[i], points[i+1]);
+	}
+	perim += SimplePoint::norm(points[0], points[points.size()-1]);
+
+	for (size_t i = 0; i < points.size(); ++i) {
+		if (i != 0)
+			accum += SimplePoint::norm(points[i], points[i-1]);
+		points[i].linear = accum/perim;
+	}
 }
 
 /** Saves to specific stream with format specified by FileType

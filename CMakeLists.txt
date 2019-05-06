@@ -5,6 +5,10 @@ find_package( OpenCV REQUIRED )
 message(${OpenCV_LIBS})
 message(${OpenCV_INCLUDE_DIRS})
 
+find_library(GEOS_C geos_c)
+find_path(GEOS_INC geos_c.h)
+
+
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif()
@@ -12,8 +16,6 @@ endif()
 include_directories( ${OpenCV_INCLUDE_DIRS} "./inc")
 
 set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_BUILD_TYPE Release)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -Werror -g -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -46,8 +48,6 @@ add_executable(terminal src/terminal.cpp src/polygon.cpp)
 target_link_libraries(terminal ${OpenCV_LIBS} ${GEOS_C})	
 
 ##############GEOS########################
-find_library(GEOS_C geos_c)
-find_path(GEOS_INC geos_c.h)
 
 add_executable(geom src/geos_main.cpp src/polygon.cpp)
 target_link_libraries(geom ${GEOS_C})

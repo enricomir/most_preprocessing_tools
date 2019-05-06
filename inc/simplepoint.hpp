@@ -3,7 +3,8 @@
 
 struct SimplePoint {
   double x, y;
-  SimplePoint(double x, double y) : x(x), y(y){};
+	double linear;
+  SimplePoint(double x, double y) : x(x), y(y), linear(0) {};
 
   static double norm(const SimplePoint &p1, const SimplePoint &p2, double dz = 0.0) {
     double dx = p1.x - p2.x;
