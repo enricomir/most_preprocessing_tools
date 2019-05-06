@@ -43,22 +43,20 @@ add_executable(smoke_remover src/smoke_remover.cpp)
 target_link_libraries(smoke_remover ${OpenCV_LIBS})	
 
 add_executable(terminal src/terminal.cpp src/polygon.cpp)
-target_link_libraries(terminal ${OpenCV_LIBS} ${GEOS})	
+target_link_libraries(terminal ${OpenCV_LIBS} ${GEOS_C})	
 
 ##############GEOS########################
 find_library(GEOS_C geos_c)
 find_path(GEOS_INC geos_c.h)
 
-message(${GEOS})
-message(${GEOS_INC})
 add_executable(geom src/geos_main.cpp src/polygon.cpp)
-target_link_libraries(geom ${GEOS})
+target_link_libraries(geom ${GEOS_C})
 
 add_executable(msimp src/multi_simplifier.cpp src/polygon.cpp src/simplifier.cpp)
-target_link_libraries(msimp ${GEOS})
+target_link_libraries(msimp ${GEOS_C})
 
 add_executable(ga src/ga_main.cpp src/polygon.cpp src/ga.cpp)
-target_link_libraries(ga ${GEOS})
+target_link_libraries(ga ${GEOS_C})
 
 add_executable(aligner src/aligner_main.cpp src/polygon.cpp src/aligner.cpp)
-target_link_libraries(aligner ${GEOS})
+target_link_libraries(aligner ${GEOS_C})
