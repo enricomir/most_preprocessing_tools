@@ -38,6 +38,8 @@ public:
   void cross(individual &ind1, individual &ind2);
 
   double eval(const individual &ind);
+
+	void fix(individual& ind);
 };
 
 #endif // GA_HPP_
