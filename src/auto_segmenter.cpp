@@ -117,7 +117,7 @@ int main(int argc, char** argv)
 {
     if (argc != 3) {
         std::cout
-            << "Wrong usage! Correct usage: ./segmenter <i/v> <source image>\n";
+            << "Wrong usage! Correct usage: ./segmenter <i/v/b> <source image>\n";
         exit(1);
     }
 
@@ -219,6 +219,31 @@ int main(int argc, char** argv)
     auto diff = end - start;
     std::cout << "Finished with: " << diff.count() << " seconds." << std::endl;
     */
-    }
-    return 0;
+    } else if (argv[1][0] == 'b') { //Generate contour for binary image
+        Mat image; // Original image
+        image = imread(argv[2]);
+        if (image.empty()) {
+            std::cout << "Error - could not read file " << argv[2] << "as image.\n";
+            exit(2);
+        }
+
+				std::vector<std::vector<Point>> vertexes;
+
+				cvtColor(image, image, COLOR_BGR2GRAY);
+				image.convertTo(image, CV_8UC1);
+
+				image = 255 - image;
+
+				findContours(image, vertexes, RETR_EXTERNAL, CHAIN_APPROX_TC89_KCOS);
+				std::fstream fs(string(argv[2]) + ".pof",
+						std::fstream::in | std::fstream::out | std::fstream::trunc);
+				if (!fs.is_open()) {
+					std::cout << "Error not open\n";
+					exit(3);
+				}
+				for (Point p : vertexes[0]) {
+					fs << p.x << " " << p.y << "\n";
+				}
+		}
+		return 0;
 }

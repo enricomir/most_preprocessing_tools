@@ -1,4 +1,5 @@
 #include "simplifier.hpp"
+#include <fstream>
 
 using namespace Simplifier;
 
@@ -276,3 +277,138 @@ void Simplifier::visvalingam_until_n(Polygon& poly, const float& red_percentage)
 	}
 }
 
+std::vector<std::pair<size_t, size_t>> correspondences;
+double get_cost_with_corresp(const size_t& i_pt, const std::vector<Polygon>& polys, 
+                             const size_t& i_pol, const size_t& i_pair) {
+	const double sigma_b = 10.0;
+
+	std::vector<size_t> pairs;
+	for (const std::pair<size_t, size_t> p : correspondences) {
+		if (i_pol == 0) {
+			if (p.first == polys[i_pol].points[i_pt].original_index)
+				for (size_t i = 0; i < polys[i_pair].points.size(); ++i) {
+					if (polys[i_pair].points[i].original_index == p.second)
+						pairs.push_back(i);
+				}
+		} else if (i_pol == 1) {
+			if (p.second == polys[i_pol].points[i_pt].original_index)
+				for (size_t i = 0; i < polys[i_pair].points.size(); ++i) {
+					if (polys[i_pair].points[i].original_index == p.first)
+						pairs.push_back(i);
+				}
+		}
+	}
+
+	if (pairs.size() == 0)
+		return 0;
+
+	double ret = 1.0;
+	for (const size_t i : pairs) {
+		double red = std::exp(-get_triangle(i, polys[i_pair])/sigma_b);
+		ret -= red;
+	}
+
+	return ret;
+}
+
+
+void Simplifier::visvalingam_with_corr(std::vector<Polygon>& polys, float red_percentage, float area_preference) {
+	const double sigma_a = 20.0;
+	//Not enough polygons
+	if (polys.size() < 2) return;
+	std::vector<size_t> red_number;
+
+	//Decides how many points to remove from each polygon
+	for (size_t i = 0; i < polys.size(); ++i) {
+		red_number.push_back(polys[i].points.size()*red_percentage);
+	}
+
+	{
+		std::ifstream fs("corresp.txt");
+		size_t a, b;
+		while (fs >> a >> b) {
+			correspondences.push_back(std::make_pair(a,b));
+		}
+		for (size_t i = 0; i < polys[0].points.size(); ++i)
+			polys[0].points[i].original_index = i;
+		for (size_t i = 0; i < polys[1].points.size(); ++i)
+			polys[1].points[i].original_index = i;
+	}
+
+	bool cont=true;
+	size_t max = 0;
+	for (auto s: red_number)
+		if (s > max)
+			max = s;
+	while (cont) {
+		std::cout << "Reduced another point. Current max points: " << max << std::endl;
+
+		//Removes 1 point from any needed polygon
+		for (size_t i_pol = 0; i_pol < polys.size(); ++i_pol) {
+			if (red_number[i_pol] == 0) continue; //If removed all needed points, move on
+
+			//Minimum cost of points, and point associated with this cost
+			double min_cost=std::numeric_limits<double>::max();
+			size_t to_remove=0;
+
+			//Calculates the cost for all points
+			for (size_t i_pt = 0; i_pt < polys[i_pol].points.size(); ++i_pt) {
+				//Cost to remove from previous shape
+				double cost_previous = 0.0;
+				if (i_pol > 0) {
+					cost_previous = get_cost_with_corresp(i_pt, polys, i_pol, i_pol-1);
+				}
+
+				//Cost to remove from next shape
+				double cost_next = 0.0;
+				if (i_pol < (polys.size()-1)) {
+					cost_next = get_cost_with_corresp(i_pt, polys, i_pol, i_pol+1);
+				}
+
+				//Checks if current point is the cheapest to remove
+				double cost_time = (cost_previous > cost_next? cost_previous : cost_next); 
+				//Time cost should already be normalized [0, 1]
+				double cost_triangle = 1-std::exp(-get_triangle(i_pt, polys[i_pol])/sigma_a);
+
+				double cost =  area_preference * cost_triangle + (1-area_preference) * cost_time;
+
+				if (cost < min_cost) {
+					to_remove = i_pt;
+					min_cost = cost;
+				}
+			}
+			//Removes the cheapest point
+			polys[i_pol].points.erase(polys[i_pol].points.begin() + to_remove);
+			red_number[i_pol]--;
+
+/*
+			for(size_t i = 0; i < correspondences.size(); ++i) {
+				//Removes all correspondences linked to removed point
+				if (i_pol == 0) {
+					while (correspondences[i].first == to_remove && i < correspondences.size())
+						correspondences.erase(correspondences.begin() + i);
+				} else if (i_pol == 1) {
+					while (correspondences[i].second == to_remove && i < correspondences.size())
+						correspondences.erase(correspondences.begin() + i);
+				}
+
+				
+				//For all correspondences after, subtract one
+				if (i_pol == 0 && correspondences[i].first > to_remove)
+					correspondences[i].first--;
+				if (i_pol == 1 && correspondences[i].second > to_remove)
+					correspondences[i].second--;
+			}*/
+		}
+		max--;
+
+		//Loop condition - if there is still any points to remove
+		cont = false;
+		for (size_t i = 0; i < polys.size(); ++i) {
+			if (red_number[i] != 0) {
+				cont = true;
+				break;
+			}
+		}
+	}
+}

@@ -4,6 +4,7 @@
 struct SimplePoint {
   double x, y;
 	double linear;
+	size_t original_index;
   SimplePoint(double x, double y) : x(x), y(y), linear(0) {};
 
   static double norm(const SimplePoint &p1, const SimplePoint &p2, double dz = 0.0) {

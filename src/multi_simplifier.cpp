@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) {
 
 	if (argc < 4 && argc != 3) {
 		std::cout << "Error - too few arguments. Usage:\n"
-			<< "  ./msimp p <value> <file1> <file2> ...\n"
+			<< "  ./msimp <t_value> <red_value> <file1> <file2> ...\n"
 			<< "  ./msimp <value> <file>\n";
 		return 1;
 	} else if (argc == 3) {
@@ -223,10 +223,12 @@ int main(int argc, char* argv[]) {
 			polis.push_back(p);
 		}
 		double red = std::stof(argv[2]);
+		double time = std::stof(argv[1]);
 
 		std::cout << "Opened all. Red:" << red << "\n";
 
-		Simplifier::visvalingam_with_time(polis, red, 5);
+		Simplifier::visvalingam_with_time(polis, red, time);
+		//Simplifier::visvalingam_with_corr(polis, red, 0.5);
 		std::cout << "Simplified all.\n";
 
 		for (size_t i = 0; i < polis.size(); ++i) {

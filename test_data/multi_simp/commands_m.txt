@@ -1,0 +1,3 @@
+comp h simp_0.05/msimp_sq1.pof simp_0.05/msimp_sq2.pof
+comp h simp_0.10/msimp_sq1.pof simp_0.10/msimp_sq2.pof
+comp h simp_0.15/msimp_sq1.pof simp_0.15/msimp_sq2.pof
