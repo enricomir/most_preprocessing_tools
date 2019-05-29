@@ -6,8 +6,6 @@
 #include <thread>
 #include <vector>
 
-#include <tbb/tbb.h>
-
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
