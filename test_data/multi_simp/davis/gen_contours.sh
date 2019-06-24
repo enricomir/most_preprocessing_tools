@@ -6,7 +6,7 @@ for dir in $(ls -d */)
 	cd $dir
 	for file in *.png
 	do
-		../../../../build/auto_segmenter b $file
+		../../../../build/auto_segmenter w $file
 	done
 	cd ..
 done
