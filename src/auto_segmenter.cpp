@@ -217,7 +217,7 @@ int main(int argc, char** argv)
     auto diff = end - start;
     std::cout << "Finished with: " << diff.count() << " seconds." << std::endl;
     */
-    } else if (argv[1][0] == 'b') { //Generate contour for binary image
+    } else if (argv[1][0] == 'b') { //Generate contour for binary black image
         Mat image; // Original image
         image = imread(argv[2]);
         if (image.empty()) {
@@ -231,6 +231,29 @@ int main(int argc, char** argv)
 				image.convertTo(image, CV_8UC1);
 
 				image = 255 - image;
+
+				findContours(image, vertexes, RETR_EXTERNAL, CHAIN_APPROX_TC89_KCOS);
+				std::fstream fs(string(argv[2]) + ".pof",
+						std::fstream::in | std::fstream::out | std::fstream::trunc);
+				if (!fs.is_open()) {
+					std::cout << "Error not open\n";
+					exit(3);
+				}
+				for (Point p : vertexes[0]) {
+					fs << p.x << " " << p.y << "\n";
+				}
+    } else if (argv[1][0] == 'w') { //Generate contour for binary white image
+        Mat image; // Original image
+        image = imread(argv[2]);
+        if (image.empty()) {
+            std::cout << "Error - could not read file " << argv[2] << "as image.\n";
+            exit(2);
+        }
+
+				std::vector<std::vector<Point>> vertexes;
+
+				cvtColor(image, image, COLOR_BGR2GRAY);
+				image.convertTo(image, CV_8UC1);
 
 				findContours(image, vertexes, RETR_EXTERNAL, CHAIN_APPROX_TC89_KCOS);
 				std::fstream fs(string(argv[2]) + ".pof",
