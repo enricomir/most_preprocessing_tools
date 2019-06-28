@@ -47,7 +47,11 @@ int main(int, char **) {
         dist = Polygon::chamfer(p1, p2);
       } else if (words[0] == "p") { // Compute polis distance
         dist = Polygon::polis(p1, p2);
-      }
+      } else if (words[0] == "j") { // Compute Jaccard index
+				dist = Polygon::jaccard(p1, p2);
+      } /*else if (words[0] == "f") { // Compute Frechet distance
+				dist = Polygon::frechet(p1, p2);
+			}*/
 
       std::cout << dist << std::endl;
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include <opencv2/core.hpp>
 #include <iostream>
+#include <geos_c.h>
 #include "simplepoint.hpp"
 
 class Polygon {
@@ -28,6 +29,11 @@ class Polygon {
         static double hausdorff(const Polygon& pol1, const Polygon& pol2);
         static double chamfer(const Polygon& pol1, const Polygon& pol2);
         static double polis(const Polygon& pol1, const Polygon& pol2);
+				static double jaccard(const Polygon& pol1, const Polygon& pol2);
+				static double frechet(const Polygon& pol1, const Polygon& pol2);
+			private:
+				GEOSGeom get_GEOSGeom(GEOSContextHandle_t geos) const;
+				void print(GEOSContextHandle_t geos, char* prefix = nullptr);
 };
 
 #endif //POLYGON_HPP
