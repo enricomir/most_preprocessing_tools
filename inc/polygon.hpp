@@ -30,7 +30,8 @@ class Polygon {
         static double chamfer(const Polygon& pol1, const Polygon& pol2);
         static double polis(const Polygon& pol1, const Polygon& pol2);
 				static double jaccard(const Polygon& pol1, const Polygon& pol2);
-				static double frechet(const Polygon& pol1, const Polygon& pol2);
+				static double frechet(const Polygon& pol1, const Polygon& pol2); //Not implemented
+				//Needs GEOS 3.8+, Linux default is 3.6. Harder to get dependencies.
 			private:
 				GEOSGeom get_GEOSGeom(GEOSContextHandle_t geos) const;
 				void print(GEOSContextHandle_t geos, char* prefix = nullptr);
