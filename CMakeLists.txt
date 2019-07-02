@@ -55,6 +55,9 @@ target_link_libraries(geom ${GEOS_C})
 add_executable(twkt_converter src/twkt_converter.cpp src/polygon.cpp)
 target_link_libraries(twkt_converter ${GEOS_C})
 
+add_executable(pof2wkt src/pof2wkt.cpp src/polygon.cpp)
+target_link_libraries(pof2wkt ${GEOS_C})
+
 add_executable(msimp src/multi_simplifier.cpp src/polygon.cpp src/simplifier.cpp)
 target_link_libraries(msimp ${GEOS_C})
 
