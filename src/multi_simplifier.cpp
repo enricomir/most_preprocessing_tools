@@ -206,20 +206,35 @@ int main(int argc, char* argv[]) {
 	} else if (argc == 3) {
 		double red = std::stod(argv[1]);
 		std::ifstream in(argv[2]);
-		Polygon p(in);
+		Polygon::FileType ft;
+		if (in.peek() == 'P') { //First character is P -> expecting WKT POLYGON((
+			ft = Polygon::FileType::FILE_WKT;
+		} else {
+			ft = Polygon::FileType::FILE_POF;
+		}
+
+		Polygon p(in, ft);
 
 		Simplifier::visvalingam_until_n(p, red);
 
 		std::ofstream out_file("simp_"+std::string(argv[2]));
-		p.save(out_file);
+		p.save(out_file, ft);
 	} else {
 		std::vector<Polygon> polis;
 
+		Polygon::FileType ft;
 		for (int i = 3; i < argc; ++i) {
 			std::cout << "Opening " << argv[i] << std::endl;
 			std::ifstream in(argv[i]);
 
-			Polygon p(in);
+			if (in.peek() == 'P') { //First character is P -> expecting WKT POLYGON((
+				ft = Polygon::FileType::FILE_WKT;
+			} else {
+				ft = Polygon::FileType::FILE_POF;
+			}
+
+
+			Polygon p(in, ft);
 			polis.push_back(p);
 		}
 		double red = std::stof(argv[2]);
@@ -234,7 +249,7 @@ int main(int argc, char* argv[]) {
 		for (size_t i = 0; i < polis.size(); ++i) {
 			std::cout << "Saving to " << ("msimp_"+std::string(argv[i+3])) << "\n";
 			std::ofstream out_file("msimp_"+std::string(argv[i+3]));
-			polis[i].save(out_file);
+			polis[i].save(out_file, ft);
 		}
 	}
 
