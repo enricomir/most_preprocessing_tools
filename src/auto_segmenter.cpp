@@ -262,7 +262,17 @@ int main(int argc, char** argv)
 					std::cout << "Error not open\n";
 					exit(3);
 				}
-				for (Point p : vertexes[0]) {
+
+				size_t biggest = 0;
+				size_t biggest_size = 0;
+				for (size_t i = 0; i < vertexes.size(); ++i) {
+					if (vertexes[i].size() > biggest_size) {
+						biggest = i;
+						biggest_size = vertexes[i].size();
+					}
+				}
+
+				for (Point p : vertexes[biggest]) {
 					fs << p.x << " " << p.y << "\n";
 				}
 		}
